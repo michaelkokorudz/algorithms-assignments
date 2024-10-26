@@ -176,24 +176,52 @@ def buildHull( points ):
     if len(points) == 3:
 
         # Base case of 3 points: make a hull
-        
-        # [YOUR CODE HERE]
-      
+        # Initialize the three points from the inputted set
+        a = points[0]
+        b = points[1]
+        c = points[2]
+        # If a left turn from a around b to c, then set the cw and ccw pointers accordingly
+        if turn(a,b,c) == LEFT_TURN:
+            a.cwPoint = c
+            a.ccwPoint = b
+            b.cwPoint = a 
+            b.ccwPoint = c
+            c.cwPoint = b
+            c.ccwPoint = a
+        # If a right turn from a around b to c, then set the cw and ccw pointers accordingly
+        elif turn(a,b,c) == RIGHT_TURN:
+            a.cwPoint = b
+            a.ccwPoint = c
+            b.cwPoint = c
+            b.ccwPoint = a
+            c.cwPoint = a
+            c.ccwPoint = b
         pass
 
     elif len(points) == 2:
 
         # Base case of 2 points: make a hull
-
-        # [YOUR CODE HERE]
+        # Initialize the two points from the inputted set
+        a = points[0]
+        b = points[1]
+        # Set the cw and ccw pointers accordingly, given there are only two points
+        a.ccwPoint = b
+        a.cwPoint = b
+        b.cwPoint = a
+        b.ccwPoint = a
       
         pass
 
     else:
-
-        # Recurse to build left and right hull
-
-        # [YOUR CODE HERE]
+        # Floor division the length of the inputted set by 2, to split the set into two sets of points
+        mid = len(points) // 2
+        # Since the inputted set of points is sorted, recursively build a hull from the left half and the right half of the inputted set of points
+        L = points[:mid]   
+        R = points[mid:]  
+        # Recursively build the right and left hulls
+        buildHull(L)
+        buildHull(R)
+      
       
         pass
 
@@ -216,12 +244,106 @@ def buildHull( points ):
             p.highlight = True
         display(wait=addPauses)
 
-        # Merge the two hulls
+        #Walk Downward
 
-        # [YOUR CODE HERE]
+        #find the rightmost point on the left hull and the leftmost on the right hull
+        lowerLeft = L[len(L) - 1]
+        lowerRight = R[0]
+        #move the lowerLeft and lowerRight points downward on their hulls to bridge the bottom of the joint hull
+        while turn(lowerLeft, lowerRight, lowerRight.ccwPoint) == RIGHT_TURN or turn(lowerLeft.cwPoint, lowerLeft, lowerRight) == RIGHT_TURN:
+            #walk the current point on the left hull downward
+            if turn(lowerLeft.cwPoint, lowerLeft, lowerRight) == RIGHT_TURN:
+                #if the current point is the rightmost point on the left hull, only walk down
+                if lowerLeft == L[len(L)-1]:
+                    lowerLeft = lowerLeft.cwPoint
+
+                #if below the rightmost point on the left hull, set the pointers of the current point to null, then walk down
+                else:
+                    temp = lowerLeft
+                    lowerLeft = lowerLeft.cwPoint
+                    temp.cwPoint = None
+                    temp.ccwPoint = None
+
+            #walk the current point on the right hull downward
+            else:
+                #if the current point is the leftmost point on the right hull, only walk down
+                if lowerRight == R[0]:  
+                    lowerRight = lowerRight.ccwPoint
+
+                #if below the leftmost point on the right hull, set the pointers of the current point to null, then walk down
+                else:
+                    temp = lowerRight 
+                    lowerRight = lowerRight.ccwPoint
+                    temp.ccwPoint = None
+                    temp.cwPoint = None
+
+        #Walk Upward
+
+        #find the rightmost point on the left hull and the leftmost on the right hull
+        upperLeft = L[len(L) - 1]
+        upperRight = R[0]
+        while turn(upperLeft.ccwPoint, upperLeft, upperRight) == LEFT_TURN or turn(upperLeft, upperRight, upperRight.cwPoint) == LEFT_TURN:
+            #walk the current point on the left hull upward
+            if turn(upperLeft.ccwPoint, upperLeft, upperRight) == LEFT_TURN:
+                #if the current point is the rightmost point on the left hull, only walk up
+                if upperLeft == L[len(L)- 1]:
+                     upperLeft = upperLeft.ccwPoint
+
+                #if below the rightmost point on the left hull, set the pointers of the current point to null, then walk up
+                else:
+                    temp = upperLeft
+                    upperLeft = upperLeft.ccwPoint
+                    temp.cwPoint = None
+                    temp.ccwPoint = None
+
+            #walk the current point on the right hull upward
+            else:
+                 #if the current point is the leftmost point on the right hull, only walk up
+                if upperRight == R[0]:
+                     upperRight = upperRight.cwPoint
+
+                 #if below the leftmost point on the right hull, set the pointers of the current point to null, then walk up
+                else:
+                    temp = upperRight
+                    upperRight = upperRight.cwPoint
+                    temp.cwPoint = None
+                    temp.ccwPoint = None
+
+        #join the bottom and top of hulls
+
+        #checks any of the top-most joining points or bottom-most joining points are equal to either the leftmost on the right hull or the rightmost on the right hull
+        if upperLeft == L[len(L) - 1] or lowerLeft == L[len(L)- 1] or upperRight == R[0] or lowerRight == R[0]:
+            #join the bottom and top of the hulls via setting the corresponding cw and ccw pointers
+            upperLeft.cwPoint = upperRight
+            lowerLeft.ccwPoint = lowerRight
+            upperRight.ccwPoint = upperLeft
+            lowerRight.cwPoint = lowerLeft
+            #checks if any do not equal the leftmost point on the right hull
+            if upperRight != R[0] and lowerRight != R[0]:
+                R[0].ccwPoint = None
+                R[0].cwPoint = None
+            #checks if any do not equal the rightmost point on the left hull
+            elif upperLeft != L[len(L) - 1] and lowerLeft != L[len(L)- 1]:
+                L[len(L)- 1].ccwPoint = None
+                L[len(L)- 1].cwPoint = None
+            #if both checks failed, then no pointers regarding the leftmost and rightmost points need to be adjusted
+        
+        #if none of the top/bottom most joining points are equal to the leftmost or rightmost points, then set their ccw and cw pointers to None
+        else: 
+            #join the bottom and top of the hulls via setting the corresponding cw and ccw pointers
+            upperLeft.cwPoint = upperRight
+            lowerLeft.ccwPoint = lowerRight
+            upperRight.ccwPoint = upperLeft
+            lowerRight.cwPoint = lowerLeft
+            #set ccw and cw of both points below to None
+            R[0].ccwPoint = None
+            R[0].cwPoint = None
+            L[len(L)- 1].ccwPoint = None
+            L[len(L)- 1].cwPoint = None
+        
+
 
         pass
-
         # Pause to see the result, then remove the highlighting from
         # the points that you previously highlighted:
 
