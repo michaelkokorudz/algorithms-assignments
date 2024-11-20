@@ -1,14 +1,10 @@
-Name: Michael Kokorudz
-Student Number: 20354593
-netID = 21mek25
+My Approach
+Data Structure: I utilized a min-heap that holds a tuple containing the triangle's valence, a unique identifier (ID), and the triangle object itself.
+Efficient Access: The min-heap allows efficient access to the triangles with minimal valence when starting a new strip.
+Handling Skipped Triangles: Triangles already on a strip do not need to be removed from the min-heap, as they are simply skipped upon access.
+Progression: The algorithm proceeds to the next minimum valence triangle that is not part of any strip.
+Valence Updates: When a triangle is added to a strip, the valence of its neighboring triangles is updated.
+Heap Properties: As the valence of a triangle can only decrease, the old version is never accessed before the updated version due to the properties of the min-heap.
+Time Complexity
+This approach ensures a total algorithm time complexity of O(n log n).
 
-
-Comments for TA:
-I utilized a min-heap holding the tuple of the triangles valence, unique identifier (id) and the triangle object itself. 
-The min-heap was used for efficient access to the minimal valence triangles when starting a new strip. 
-Removal from the min-heap is not required for triangles already on a strip, as they are skipped upon access. 
-The algorithm then moves on to the next minimum valence triangle that is not part of any strip.
-When a triangle is added to a strip, the valence of its neighbors is updated. 
-Since the valence of a triangle can only decrease, the old version will not be accessed before the updated version due to the min-heap's properties.
-This approach ensures a total algorithm time complexity of O(nlogn). 
-The professor also stated the use of a min-heap was allowed and personally encouraged it. 
