@@ -1,4 +1,4 @@
-##My Approach
+#My Approach
 Data Structure: I utilized a min-heap that holds a tuple containing the triangle's valence, a unique identifier (ID), and the triangle object itself.
 Efficient Access: The min-heap allows efficient access to the triangles with minimal valence when starting a new strip.
 Handling Skipped Triangles: Triangles already on a strip do not need to be removed from the min-heap, as they are simply skipped upon access.
